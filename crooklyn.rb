@@ -9,8 +9,7 @@ require 'httparty'
     end
 
     puts "Currently checking avaiable listsings on Nooklyn..."
-    available_rooms = JSON(HTTParty.get('https://nooklyn.com/api/v1/listings').parsed_response)
-
+    available_rooms = JSON(HTTParty.get("https://nooklyn.com/listings.json?").parsed_response)
     puts "We've found #{available_rooms['data'].count} listings."
     CSV.open("Nooklyn Available Listings_#{Date.today.to_s}.csv", 'wb') do |csv|
       csv << ["Room Id",
@@ -31,7 +30,7 @@ require 'httparty'
         next if room['attributes']['residential'] == false || room['attributes']['status'] ==  "Rented" || (Date.today - Date.parse(room['attributes']['updated-at'].slice(0, 10))).to_i  > 30
         id = room['id']
         neighborhood = neighborhoods[room['relationships']['neighborhood']['data']['id'].to_i - 1][:name]
-        url = "https://nooklyn.com/listings/#{id}"
+        url = "https://nooklyn.com/api/v1/listings/#{id}"
         bathrooms = room['attributes']['bathrooms']
         bedrooms = room['attributes']['bedrooms']
         price = room['attributes']['price']
